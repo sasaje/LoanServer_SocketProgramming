@@ -82,21 +82,26 @@ public class ServerMultipleClients extends Application{
                 DataInputStream inputFromClient = new DataInputStream(socket.getInputStream());
                 DataOutputStream outputToClient = new DataOutputStream(socket.getOutputStream());
 
-                while(true) {
+                while(true){
                     //Step 4 data calculation   |   kn = k0*(1+r)^n
-                    double r = (inputFromClient.readDouble()) / 100; //input from client
+                    double r = inputFromClient.readDouble(); //input from client
                     System.out.println("Annunal interest rate (r) from client: " + r);
 
-                    double n = inputFromClient.readDouble(); //input from client
+                    int n = inputFromClient.readInt(); //input from client
                     System.out.println("Number of years (n) from client: " + n);
 
                     double k0 = inputFromClient.readDouble(); //input from client
                     System.out.println("Loan amount (k0) from client: " + k0);
 
-                    double kn = k0 * Math.pow((1 + r), n);
+                    LoanCalculation calculatePayment = new LoanCalculation(k0,r,n);
 
+                    double mp = calculatePayment.getMonthlyPayment();//monthly payment
+                    double kn = calculatePayment.getTotalPayment(); //total payment inclusive r over period of n years
+
+                    outputToClient.writeDouble(mp); //output kn to client
+                    System.out.println("The monthly payment with rates in " + n + " years: " + mp);
                     outputToClient.writeDouble(kn); //output kn to client
-                    System.out.println("The amount with rates in " + n + " years: " + kn);
+                    System.out.println("The total payment with rates in " + n + " years: " + kn);
 
                     Platform.runLater(() -> content.appendText("Loan amount (k0) from client: " + k0 + "\n" +
                             "Annunal interest rate (r) from client: " + r + "\n" +

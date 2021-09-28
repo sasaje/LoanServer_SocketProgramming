@@ -29,12 +29,12 @@ public class Client extends Application{
     DataInputStream fromServer = null;
 
     Label loanserverLabel = new Label("Loan Server");
-    Label hb1Label = new Label("Annual Interest Rate: ");
-    Label hb2Label = new Label("Number of years: ");
-    Label hb3Label = new Label("Total loan amount");
-    TextField hb1Textfield = new TextField();
-    TextField hb2Textfield = new TextField();
-    TextField hb3Textfield = new TextField();
+    Label rLabel = new Label("Annual Interest Rate: ");
+    Label nLabel = new Label("Number of years: ");
+    Label k0Label = new Label("Total loan amount");
+    TextField rTextfield = new TextField();
+    TextField nTextfield = new TextField();
+    TextField k0Textfield = new TextField();
     Button submitButton = new Button("Submit");
     TextArea textArea = new TextArea();
 
@@ -42,24 +42,24 @@ public class Client extends Application{
     public void start(Stage stage) throws IOException {
 
         loanserverLabel.setStyle("-fx-font-size: 30px");
-        hb1Label.setPadding(new Insets(5,0,0,0));
-        hb2Label.setPadding(new Insets(5,0,0,0));
-        hb3Label.setPadding(new Insets(5,0,0,0));
+        rLabel.setPadding(new Insets(5,0,0,0));
+        nLabel.setPadding(new Insets(5,0,0,0));
+        k0Label.setPadding(new Insets(5,0,0,0));
 
-        HBox hb1 = new HBox(hb1Label, hb1Textfield);
-        HBox hb2 = new HBox(hb2Label, hb2Textfield);
-        HBox hb3 = new HBox(hb3Label, hb3Textfield);
+        HBox rHbox = new HBox(rLabel, rTextfield);
+        HBox nHbox = new HBox(nLabel, nTextfield);
+        HBox k0Hbox = new HBox(k0Label, k0Textfield);
 
-        hb1.setPadding(new Insets(5,0,0,0));
-        hb2.setPadding(new Insets(5,0,0,0));
-        hb3.setPadding(new Insets(5,0,0,0));
+        rHbox.setPadding(new Insets(5,0,0,0));
+        nHbox.setPadding(new Insets(5,0,0,0));
+        k0Hbox.setPadding(new Insets(5,0,0,0));
 
         VBox vb2 = new VBox(submitButton);
         vb2.setPadding(new Insets(10,10,10,10));
         VBox vb3 = new VBox(textArea);
         vb3.setPadding(new Insets(10,10,10,10));
 
-        VBox vBox = new VBox(loanserverLabel, hb1, hb2, hb3, vb2, vb3);
+        VBox vBox = new VBox(loanserverLabel, rHbox, nHbox, k0Hbox, vb2, vb3);
         vBox.setPadding(new Insets(10,10,10,10));
 
         BorderPane vboxPane = new BorderPane();
@@ -89,48 +89,42 @@ public class Client extends Application{
             textArea.appendText(ex.toString() + '\n');
         }
 
-        new Thread (() -> submitButton.setOnAction(e -> {
+        submitButton.setOnAction(e -> {
             try {
-                //Get Annual Interest rate r
-                double r = Double.parseDouble(hb1Textfield.getText().trim());
+                //Get Annual Interest rate r, n Number of years and total loan amount k0
+                double r = Double.parseDouble(rTextfield.getText());
+                double n = Double.parseDouble(nTextfield.getText());
+                double k0 = Double.parseDouble(k0Textfield.getText());
+
                 //Send to server
-                System.out.println("R er " + r);
                 toServer.writeDouble(r);
-                toServer.flush();
-
-                //Get Number of years
-                double n = Double.parseDouble(hb2Textfield.getText().trim());
-                System.out.println("N er " + n);
-                //Send to server
                 toServer.writeDouble(n);
-                toServer.flush();
-
-                //Get Loan Amount k0
-                double k0 = Double.parseDouble(hb3Textfield.getText().trim());
-                System.out.println("k0 er " + k0);
-                //Send to server
                 toServer.writeDouble(k0);
+                //flush
                 toServer.flush();
 
-                //Get kn from the server
-                double kn = fromServer.readDouble();
-                System.out.println("THIS IS kn: " + kn);
-//                    fromServer.close();
+                System.out.println("R er " + r);
+                System.out.println("N er " + n);
+                System.out.println("k0 er " + k0);
 
-                Platform.runLater(() -> {
-                    // Display to the text area
-                    textArea.appendText("Annual Interest Rate is: " + r + "\n" +
-                            "Number of years is: " + n + "\n" + "Total loan amount is: " + k0 + "\n" +
-                            "The total amount with annual interest rates in " + n + " years is: " + kn + "\n");
-                });
+                //Get mp and kn from the server
+                double mp = fromServer.readDouble();
+                double kn = fromServer.readDouble();
+
+                System.out.println("This is mp: " + mp);
+                System.out.println("This is kn: " + kn);
+
+                // Display to the text area
+                textArea.appendText("Annual Interest Rate is: " + r + "\n" +
+                        "Number of years is: " + n + "\n" + "Total loan amount is: " + k0 + "\n" +
+                        "The total amount with annual interest rates in " + n + " years is: " + kn + "\n");
             }
             catch (IOException ex) {
                 System.out.println("An error has occurred!");
                 System.err.println(ex);
             }
-        })).start();
+        });
     }
-
     public static void main(String[] args) {
         launch();
     }
