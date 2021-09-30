@@ -92,32 +92,32 @@ public class Client extends Application{
         submitButton.setOnAction(e -> {
             try {
                 //Get Annual Interest rate r, n Number of years and total loan amount k0
-                double r = Double.parseDouble(rTextfield.getText());
-                double n = Double.parseDouble(nTextfield.getText());
-                double k0 = Double.parseDouble(k0Textfield.getText());
+                double annualInterest = Double.parseDouble(rTextfield.getText());
+                double numberOfYears = Double.parseDouble(nTextfield.getText());
+                double totalLoanAmount = Double.parseDouble(k0Textfield.getText());
 
                 //Send to server
-                toServer.writeDouble(r);
-                toServer.writeDouble(n);
-                toServer.writeDouble(k0);
+                toServer.writeDouble(annualInterest);
+                toServer.writeDouble(numberOfYears);
+                toServer.writeDouble(totalLoanAmount);
                 //flush
                 toServer.flush();
 
-                System.out.println("R er " + r);
-                System.out.println("N er " + n);
-                System.out.println("k0 er " + k0);
+                System.out.println("annualInterest er " + annualInterest);
+                System.out.println("numberOfYears er " + numberOfYears);
+                System.out.println("totalLoanAmount er " + totalLoanAmount);
 
-                //Get mp and kn from the server
-                double mp = fromServer.readDouble();
-                double kn = fromServer.readDouble();
+                //Get monthlyPayment and totalPayment from the server
+                double monthlyPayment = fromServer.readDouble();
+                double totalPayment = fromServer.readDouble();
 
-                System.out.println("This is mp: " + mp);
-                System.out.println("This is kn: " + kn);
+                System.out.println("This is monthlyPayment: " + monthlyPayment);
+                System.out.println("This is totalPayment: " + totalPayment);
 
                 // Display to the text area
-                textArea.appendText("Annual Interest Rate is: " + r + "\n" +
-                        "Number of years is: " + n + "\n" + "Total loan amount is: " + k0 + "\n" +
-                        "The total amount with annual interest rates in " + n + " years is: " + kn + "\n");
+                textArea.appendText("Annual Interest Rate is: " + annualInterest + "\n" +
+                        "Number of years is: " + numberOfYears + "\n" + "Total loan amount is: " + totalLoanAmount + "\n" +
+                        "The total amount with annual interest rates in " + numberOfYears + " years is: " + totalPayment + "\n");
             }
             catch (IOException ex) {
                 System.out.println("An error has occurred!");

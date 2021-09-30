@@ -50,7 +50,7 @@ public class ServerMultipleClients extends Application{
 
                     Platform.runLater(() -> {
                         //Display clientNo for this client
-                        content.appendText("Starting thread for client " + clientNo + " ata " + new Date() + "\n");
+                        content.appendText("Starting thread for client " + clientNo + " at " + new Date() + "\n");
 
                         //Display the clients host name and IP-address
                         InetAddress inetAddress = socket.getInetAddress();
@@ -84,29 +84,29 @@ public class ServerMultipleClients extends Application{
 
                 while(true){
                     //Step 4 data calculation   |   kn = k0*(1+r)^n
-                    double r = inputFromClient.readDouble(); //input from client
-                    System.out.println("Annunal interest rate (r) from client: " + r);
+                    double annualInterest = inputFromClient.readDouble(); //input from client
+                    System.out.println("Annunal interest rate from client: " + annualInterest);
 
-                    int n = inputFromClient.readInt(); //input from client
-                    System.out.println("Number of years (n) from client: " + n);
+                    double numberOfYears = inputFromClient.readDouble(); //input from client
+                    System.out.println("Number of years from client: " + numberOfYears);
 
-                    double k0 = inputFromClient.readDouble(); //input from client
-                    System.out.println("Loan amount (k0) from client: " + k0);
+                    double totalLoanAmount = inputFromClient.readDouble(); //input from client
+                    System.out.println("Loan amount from client: " + totalLoanAmount);
 
-                    LoanCalculation calculatePayment = new LoanCalculation(k0,r,n);
+                    LoanCalculation calculatePayment = new LoanCalculation(totalLoanAmount,annualInterest, numberOfYears);
 
-                    double mp = calculatePayment.getMonthlyPayment();//monthly payment
-                    double kn = calculatePayment.getTotalPayment(); //total payment inclusive r over period of n years
+                    double monthlyPayment = calculatePayment.getMonthlyPayment();//monthly payment
+                    double totalPayment = calculatePayment.getTotalPayment(); //total payment inclusive r over period of n years
 
-                    outputToClient.writeDouble(mp); //output kn to client
-                    System.out.println("The monthly payment with rates in " + n + " years: " + mp);
-                    outputToClient.writeDouble(kn); //output kn to client
-                    System.out.println("The total payment with rates in " + n + " years: " + kn);
+                    outputToClient.writeDouble(monthlyPayment); //output kn to client
+                    System.out.println("The monthly payment with rates in " + numberOfYears + " years: " + monthlyPayment);
+                    outputToClient.writeDouble(totalPayment); //output kn to client
+                    System.out.println("The total payment with rates in " + numberOfYears + " years: " + totalPayment);
 
-                    Platform.runLater(() -> content.appendText("Loan amount (k0) from client: " + k0 + "\n" +
-                            "Annunal interest rate (r) from client: " + r + "\n" +
-                            "Number of years (n) from client: " + n + "\n" +
-                            "The amount with rates in " + n + "years: " + kn + "\n"));
+                    Platform.runLater(() -> content.appendText("Loan amount (k0) from client: " + totalLoanAmount + "\n" +
+                            "Annunal interest rate (r) from client: " + annualInterest + "\n" +
+                            "Number of years (n) from client: " + numberOfYears + "\n" +
+                            "The amount with rates in " + numberOfYears + "years: " + totalLoanAmount + "\n"));
                 }
             }
             catch(IOException ex) {
